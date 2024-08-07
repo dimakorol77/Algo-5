@@ -1,0 +1,37 @@
+-- Запрос для получения максимального и минимального значения кредитного лимита.
+SELECT MAX(credit_limit) AS max_credit_limit, MIN(credit_limit) AS min_credit_limit
+FROM customers;
+
+-- Запрос для вывода всех покупателей, у которых кредитный лимит выше среднего значения.
+SELECT *
+FROM customers
+WHERE credit_limit > (SELECT AVG(credit_limit) FROM customers);
+
+-- Запрос для подсчета количества покупателей, имя которых начинается на букву 'D' и кредитный лимит больше 500.
+SELECT COUNT(*)
+FROM customers
+WHERE cust_first_name LIKE 'D%' AND credit_limit > 500;
+
+-- Запрос для получения среднего значения цены за единицу товара.
+SELECT AVG(unit_price) AS avg_unit_price
+FROM order_items;
+
+-- Запрос для вывода имен продуктов и количества, которых меньше среднего значения.
+SELECT pi.product_name, oi.quantity
+FROM order_items oi
+JOIN product_information pi ON oi.product_id = pi.product_id
+WHERE oi.quantity < (SELECT AVG(quantity) FROM order_items);
+
+-- Запрос для вывода имени и фамилии покупателя с максимальной общей суммой покупки (ORDER_TOTAL).
+SELECT c.cust_first_name, c.cust_last_name, SUM(o.order_total) AS total_spent
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+GROUP BY c.customer_id, c.cust_first_name, c.cust_last_name
+ORDER BY total_spent DESC
+LIMIT 1;
+
+-- Запрос для получения суммы всех покупок (ORDER_TOTAL) мужчин-покупателей.
+SELECT SUM(o.order_total) AS total_men_spent
+FROM orders o
+JOIN customers c ON o.customer_id = c.customer_id
+WHERE c.gender = 'M';
